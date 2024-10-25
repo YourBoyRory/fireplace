@@ -18,11 +18,10 @@ list_descendants () {
 }
 
 displayGif() {
-    pqiv --hide-info-box --fullscreen --scale-images-up ./assets/fire.gif || echo "[error] pqiv is needed"
+    ./bin/GIF-Player ./assets/fire.gif
     rm /tmp/doBurn
     kill $(list_descendants $$)
 }
-
 
 burn CPU &
 burn CUDA &
