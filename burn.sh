@@ -18,7 +18,7 @@ list_descendants () {
 }
 
 displayGif() {
-    pqiv --hide-info-box --fullscreen --scale-images-up ./assets/fire.gif
+    ppqiv --hide-info-box --fullscreen --scale-images-up ./assets/fire.gif || echo "[error] pqiv is needed"
     rm /tmp/doBurn
     kill $(list_descendants $$)
 }
