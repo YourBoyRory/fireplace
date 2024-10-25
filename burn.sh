@@ -6,7 +6,7 @@ burn() {
 }
 
 displayGif() {
-    pqiv --fullscreen --scale-images-up ./assets/fire.gif
+    pqiv --hide-info-box --fullscreen --scale-images-up ./assets/fire.gif
     killall blender 
     killall bash
 }
