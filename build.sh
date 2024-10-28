@@ -1,13 +1,15 @@
 
 copyDependency() {
-    cp -r ./dist/Burn/_internal_full/$1 ./dist/Burn/_internal/$1
+    cp -r ./dist/fireplace/_internal_full/$1 ./dist/fireplace/_internal/$1
 }
 
-pyinstaller --name "Burn" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Burn.py
+pip install -r requirements.txt
+
+pyinstaller --name "fireplace" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
 if [[ $? -eq 0 ]]; then
-    rm ./dist/Burn/_internal_full
-    mv ./dist/Burn/_internal ./dist/Burn/_internal_full
-    mkdir ./dist/Burn/_internal
+    rm ./dist/fireplace/_internal_full
+    mv ./dist/fireplace/_internal ./dist/fireplace/_internal_full
+    mkdir ./dist/fireplace/_internal
 
     #files
     copyDependency "assets"
@@ -24,4 +26,8 @@ if [[ $? -eq 0 ]]; then
     # Python
     copyDependency "base_library.zip"
     copyDependency "libpython3.12.so.1.0"
+
+    cd ./dist/fireplace
+    tar -czvf ../fireplace.tar.gz _internal fireplace
+    echo "files in dist"
 fi

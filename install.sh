@@ -1,6 +1,9 @@
 #!/bin/bash
 
-sudo mkdir /opt/burn
-sudo chown root:root /opt/burn
-sudo cp ./dist/Burn/Burn /opt/burn
-sudo cp -r ./dist/Burn/_internal /opt/burn
+sudo mkdir /opt/fireplace
+sudo chown root:root /opt/fireplace
+sudo cp ./dist/fireplace/fireplace /opt/fireplace
+sudo cp -r ./dist/fireplace/_internal /opt/fireplace
+
+sudo ln -s /opt/fireplace/fireplace /usr/local/bin/fireplace
+
