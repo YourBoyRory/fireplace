@@ -1,4 +1,6 @@
 import math
+import os
+import sys
 import multiprocessing
 import pyopencl as cl
 import numpy as np
@@ -51,9 +53,8 @@ class GPUStressTest:
         data_buf = cl.Buffer(context, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=data)
 
         # Compile the kernel
-        with open('openCL_stress.cl', 'r') as f:
-            kernel_code = f.read()
-        program = cl.Program(context, kernel_code).build()
+
+        program = self.__compile_openCL(context, "openCL_stress.cl")
 
         # Infinite loop to keep GPU busy
         while True:
@@ -61,6 +62,16 @@ class GPUStressTest:
             global_size = (size,)  # Adjust as necessary
             program.load_gpu(queue, global_size, None, data_buf)
             queue.finish()
+
+    def __compile_openCL(self, context, clFile):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(__file__)
+        clFile_full_path = os.path.join(base_path, clFile)
+        with open(clFile_full_path, 'r') as f:
+            kernel_code = f.read()
+        return cl.Program(context, kernel_code).build()
 
     def __create_context_and_queue(self):
         platforms = cl.get_platforms()
