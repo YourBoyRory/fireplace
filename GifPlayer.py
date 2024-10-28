@@ -4,9 +4,9 @@ from PyQt5.QtGui import QMovie
 from PyQt5.QtCore import Qt
 
 class FullscreenGifWindow(QMainWindow):
+    
     def __init__(self, gif_path):
         super().__init__()
-        
         self.setWindowState(Qt.WindowFullScreen)
         self.label = QLabel(self)
         self.setCentralWidget(self.label)
@@ -24,9 +24,9 @@ class FullscreenGifWindow(QMainWindow):
         if event.key() == Qt.Key_Escape:
             self.close()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    gif_path = sys.argv[1]
-    window = FullscreenGifWindow(gif_path)
-    window.show()
-    sys.exit(app.exec_())
+class GifPlayer:
+    def __init__(self, gif_path):
+        app = QApplication(sys.argv)
+        ui = FullscreenGifWindow(gif_path)
+        ui.show()
+        sys.exit(app.exec_())
