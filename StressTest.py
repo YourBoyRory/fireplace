@@ -9,7 +9,8 @@ class CPUStressTest:
     def runBlender(self):
         random.shuffle(blender_render_list)
         for render in blender_render_list:
-            subprocess.run([blender_cli, "benchmark", render, "--blender-version", blender_version, "--device-type", "CPU"])
+            exitcode = subprocess.run([blender_cli, "benchmark", render, "--blender-version", blender_version, "--device-type", "CPU"])
+            print(exitcode)
         return True
 
 class GPUStressTest:
@@ -21,7 +22,8 @@ class GPUStressTest:
         if self.GAPI != None:
             random.shuffle(blender_render_list)
             for render in blender_render_list:
-                subprocess.run([blender_cli, "benchmark", render, "--blender-version", blender_version, "--device-type", self.GAPI])
+                exitcode = subprocess.run([blender_cli, "benchmark", render, "--blender-version", blender_version, "--device-type", self.GAPI])
+                print(exitcode)
             return True
         else:
             print("ERROR: GPU not supported. Locking GPU thread.")
