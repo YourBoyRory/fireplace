@@ -25,4 +25,5 @@ def getAssetPath(file):
 if __name__ == "__main__":
     startTests()
     GifPlayer(getAssetPath('fire.gif'))
+    print("Goodbye...")
     stopTests()

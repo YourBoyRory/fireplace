@@ -22,48 +22,51 @@ class CPUStressTest:
             num += 1
 
     def startLoad(self):
-        num_workers = multiprocessing.cpu_count()
-        if num_workers > 2:
-            num_workers -= 2
+        self.num_workers = multiprocessing.cpu_count()
+        # this makes make sure there are cores avalible so the system is usable
+        if self.num_workers > 2:
+            self.num_workers -= 2
         else:
-            num_workers -= 1
+            self.num_workers -= 1
+
+        print(f"CPU Info: Dispatching {self.num_workers} CPU Worker")
 
         self.__workers = []
-        for _ in range(num_workers):
+        for _ in range(self.num_workers):
             worker = multiprocessing.Process(target=self.__generatePrimes)
             self.__workers.append(worker)
             worker.start()
+            print("    Started CPU Worker")
 
     def stopLoad(self):
+        print(f"CPU Info: Stopping {self.num_workers} CPU Worker")
         for worker in self.__workers:
             worker.terminate()
+            print("    Stopped CPU Worker")
+        print(f"CPU Info: Stopped CPU Dispatcher")
         for worker in self.__workers:
             worker.join()
 
 class GPUStressTest:
 
     def __run(self):
-        # Set up OpenCL context and queue
         context, queue = self.__create_context_and_queue()
 
-        # Create a very large buffer
-        size = 50 * 1024 * 1024  # 50 MB of data to stress the GPU
+        # 50 MB buffer
+        size = 50 * 1024 * 1024
         data = np.random.rand(size).astype(np.float32)
         mf = cl.mem_flags
         data_buf = cl.Buffer(context, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=data)
 
-        # Compile the kernel
-
         program = self.__compile_openCL(context, "openCL_stress.cl")
-
-        # Infinite loop to keep GPU busy
+        print("GPU Info: Started GPU Worker")
         while True:
-            # Launch a large number of work items
-            global_size = (size,)  # Adjust as necessary
+            global_size = (size,)
             program.load_gpu(queue, global_size, None, data_buf)
             queue.finish()
 
     def __compile_openCL(self, context, clFile):
+        print("GPU Info: Compiling OpenCL workload.")
         if getattr(sys, 'frozen', False):
             base_path = sys._MEIPASS
         else:
@@ -71,7 +74,9 @@ class GPUStressTest:
         clFile_full_path = os.path.join(base_path, clFile)
         with open(clFile_full_path, 'r') as f:
             kernel_code = f.read()
-        return cl.Program(context, kernel_code).build()
+        program = cl.Program(context, kernel_code).build()
+        print("GPU Info: Compilation done")
+        return program
 
     def __create_context_and_queue(self):
         platforms = cl.get_platforms()
@@ -80,12 +85,14 @@ class GPUStressTest:
         return context, queue
 
     def startLoad(self):
-        self.process = multiprocessing.Process(target=self.__run)
-        self.process.start()
+        self.worker = multiprocessing.Process(target=self.__run)
+        self.worker.start()
+        print("GPU Info: Dispatching GPU Worker")
 
     def stopLoad(self):
-        if self.process:
-            self.process.terminate()
-            self.process.join()
-            self.process = None
+        if self.worker:
+            self.worker.terminate()
+            self.worker.join()
+            self.worker = None
+        print("GPU Info: Stopped GPU Worker")
 

@@ -12,6 +12,9 @@ class GifWindow(QMainWindow):
         self.label = QLabel(self)
         self.movie = QMovie(gif_path)
 
+        if "--fullscreen" in sys.argv:
+            self.setWindowState(Qt.WindowFullScreen)
+
         self.setCentralWidget(self.label)
         self.label.setMovie(self.movie)
         self.movie.start()

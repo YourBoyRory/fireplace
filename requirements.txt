@@ -1,0 +1,4 @@
+numpy==1.26.4
+pyinstaller==6.11.0
+pyopencl==2024.2.6
+PyQt5==5.15.11
