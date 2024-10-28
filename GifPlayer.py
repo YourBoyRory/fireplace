@@ -4,31 +4,34 @@ from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt5.QtGui import QMovie
 from PyQt5.QtCore import Qt
 
-class FullscreenGifWindow(QMainWindow):
-    
+class GifWindow(QMainWindow):
+
     def __init__(self, gif_path):
         super().__init__()
-        self.setWindowState(Qt.WindowFullScreen)
+
         self.label = QLabel(self)
-        self.setCentralWidget(self.label)
         self.movie = QMovie(gif_path)
+
+        self.setCentralWidget(self.label)
         self.label.setMovie(self.movie)
         self.movie.start()
+        self.label.setMinimumSize(800, 600)
         self.label.setScaledContents(True)
-        self.label.setGeometry(self.rect())
-        self.label.setAlignment(Qt.AlignCenter)
-
-    def resizeEvent(self, event):
-        self.label.setGeometry(self.rect())
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.close()
+        elif event.key() == Qt.Key_F11:
+            if self.isFullScreen():
+                self.setWindowState(Qt.WindowNoState)
+            else:
+                self.setWindowState(Qt.WindowFullScreen)
+
 
 class GifPlayer:
     def __init__(self, gif_path):
         app = QApplication(sys.argv)
-        ui = FullscreenGifWindow(gif_path)
+        ui = GifWindow(gif_path)
         ui.show()
         app.exec_()
-        
+
