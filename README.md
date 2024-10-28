@@ -1,7 +1,14 @@
-Runs Prime Generaterator on the CPU and Hashing algorithms on the GPU to generate as much heat as possible
+# Thermal Torture Test
 
-I made this because I was cold, but I guess you could use this for themral testings.
+## Overview
+This program runs **Prime Generation** on the CPU and **Hashing Algorithms** on the GPU to generate as much heat as possible.
+I made this because I was cold, but I guess you could use this for thermal testing.
 
---fullscreen will launch the fireplace movie in fullscreen but you can press f11 to fullscreen as well
+## Usage
+- **Launch**: Run the program.
+- **Profit?**: PC gets warm!
+- **Hot Enought?**: Press Esc or Close the program
 
-Esc or pressing thr x will stop torturing your pc
+## Command Line Arguments
+
+    --fullscreen    - Launch the fireplace movie in fullscreen, but you can press F11 to fullscreen as well.
