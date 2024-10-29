@@ -3,8 +3,8 @@ copyDependency() {
     cp -r ./dist/fireplace/_internal_full/$1 ./dist/fireplace/_internal/$1
 }
 
+echo "Build and packaging for Linux"
 pip install -r requirements.txt
-
 pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
 if [[ $? -eq 0 ]]; then
     rm ./dist/fireplace/_internal_full
@@ -28,6 +28,18 @@ if [[ $? -eq 0 ]]; then
     copyDependency "libpython3.12.so.1.0"
 
     cd ./dist/fireplace
-    tar -czvf ../fireplace.tar.gz _internal fireplace
-    echo "files in dist"
+    tar -czvf ../fireplace-linux.tar.gz _internal fireplace
 fi
+
+cd ../..
+echo "Build and packaging for Windows"
+wine ./build-windows.cmd
+cd ./dist/
+zip  ./fireplace-windows.zip ./Fireplace.exe
+
+echo " "
+echo "Packaging Complete"
+echo " "
+cd ..
+ls -lh ./dist/fireplace-windows.zip 
+ls -lh ./dist/fireplace-linux.tar.gz
