@@ -4,17 +4,6 @@ from GifPlayer import GifPlayer
 from StressTest import CPUStressTest
 from StressTest import GPUStressTest
 
-gpuStresser = GPUStressTest()
-cpuStresser = CPUStressTest()
-
-def startTests():
-    cpuStresser.startLoad()
-    gpuStresser.startLoad()
-
-def stopTests():
-    cpuStresser.stopLoad()
-    gpuStresser.stopLoad()
-
 def getAssetPath(file):
     if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
@@ -23,7 +12,17 @@ def getAssetPath(file):
     return os.path.join(base_path, 'assets', file)
 
 if __name__ == "__main__":
-    startTests()
-    GifPlayer(getAssetPath('fire.gif'))
-    print("Goodbye...")
-    stopTests()
+
+    gpuStresser = GPUStressTest()
+    cpuStresser = CPUStressTest()
+
+    try:
+        cpuStresser.startLoad()
+        gpuStresser.startLoad()
+        GifPlayer(getAssetPath('fire.gif'))
+    except Exception as e:
+        print(f"\nAh shit, here we go again... {e}")
+    finally:
+        print("Goodbye...")
+        cpuStresser.stopLoad()
+        gpuStresser.stopLoad()
