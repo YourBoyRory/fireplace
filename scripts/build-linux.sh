@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ..
-
 if [[ "$1" != "--use-system-packages" ]]; then
     python -m venv ./venv
     source ./venv/bin/activate
@@ -11,3 +9,9 @@ else
 fi
 
 pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
+
+echo " "
+echo "Packaging Complete"
+echo " "
+
+ls -lh ./dist/fireplace
