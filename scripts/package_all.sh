@@ -15,7 +15,7 @@ if [[ $? -eq 0 ]]; then
 
     #files
     copyDependency "assets"
-    copyDependency "openCL_stress.cl"
+    copyDependency "opencl_workloads"
 
     # Libs
     copyDependency "setuptools"
