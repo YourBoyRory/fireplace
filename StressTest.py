@@ -22,6 +22,7 @@ class CPUStressTest:
             num += 1
 
     def startLoad(self):
+        multiprocessing.freeze_support()
         num_workers = multiprocessing.cpu_count()
         # this makes make sure there are cores avalible so the system is usable
         if num_workers > 2:
@@ -85,15 +86,16 @@ class GPUStressTest:
             if platform.get_devices() != []:
                 device = platform.get_devices()[0]
                 break
+        print(f"GPU Info: Dispatching GPU Worker on {device}")
         context = cl.Context([device])
         queue = cl.CommandQueue(context)
         return context, queue
 
     def startLoad(self):
+        multiprocessing.freeze_support()
         worker = multiprocessing.Process(target=self.run)
         worker.start()
         self.worker = worker
-        print("GPU Info: Dispatching GPU Worker")
 
     def stopLoad(self):
         if self.worker:
