@@ -8,7 +8,7 @@ else
     echo "Using system packages"
 fi
 
-pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
+pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "opencl_workloads/opencl_stress.cl:opencl_workloads" ./Fireplace.py
 
 echo " "
 echo "Packaging Complete"

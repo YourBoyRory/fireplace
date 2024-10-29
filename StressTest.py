@@ -60,7 +60,7 @@ class GPUStressTest:
         mf = cl.mem_flags
         data_buf = cl.Buffer(context, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=data)
 
-        program = self.compile_openCL(context, "openCL_stress.cl")
+        program = self.compile_openCL(context, "opencl_stress.cl")
         print("GPU Info: Started GPU Worker")
         while True:
             global_size = (size,)
@@ -73,7 +73,7 @@ class GPUStressTest:
             base_path = sys._MEIPASS
         else:
             base_path = os.path.dirname(__file__)
-        clFile_full_path = os.path.join(base_path, clFile)
+        clFile_full_path = os.path.join(base_path, 'opencl_workloads', clFile)
         with open(clFile_full_path, 'r') as f:
             kernel_code = f.read()
         program = cl.Program(context, kernel_code).build()
@@ -103,4 +103,3 @@ class GPUStressTest:
             self.worker.join()
             self.worker = None
         print("GPU Info: Stopped GPU Worker")
-
