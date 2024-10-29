@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 if [[ "$1" != "--use-system-packages" ]]; then
     python -m venv ./venv
     source ./venv/bin/activate

@@ -1,15 +1,17 @@
 #!/bin/bash
 
+
 copyDependency() {
-    cp -r ./dist/fireplace/_internal_full/$1 ./dist/fireplace/_internal/$1
+    cp -r ./_internal_full/$1 ./_internal/$1
 }
 
 echo "Build and packaging for Linux"
 ./build-linux.sh --use-system-packages
 if [[ $? -eq 0 ]]; then
-    rm ./dist/fireplace/_internal_full
-    mv ./dist/fireplace/_internal ./dist/fireplace/_internal_full
-    mkdir ./dist/fireplace/_internal
+    cd ../dist/fireplace
+    rm ./_internal_full
+    mv ./_internal ./_internal_full
+    mkdir ./_internal
 
     #files
     copyDependency "assets"
@@ -29,14 +31,13 @@ if [[ $? -eq 0 ]]; then
     copyDependency "base_library.zip"
     copyDependency "libpython3.12.so.1.0"
 
-    cd ./dist/fireplace
     tar -czvf ../fireplace-linux.tar.gz _internal fireplace
-    cd ../..
+    cd ../../scripts/
 fi
 
 echo "Build and packaging for Windows"
 wine ./build-windows.cmd
-cd ./dist/
+cd ../dist/
 zip  ./fireplace-windows.zip ./Fireplace.exe
 
 echo " "
