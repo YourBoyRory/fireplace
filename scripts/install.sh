@@ -1,6 +1,6 @@
 #!/bin/bash
 
-uninstall.sh
+./scripts/uninstall.sh
 
 sudo mkdir /opt/fireplace
 sudo chown root:root /opt/fireplace
