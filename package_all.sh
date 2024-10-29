@@ -1,11 +1,11 @@
+#!/bin/bash
 
 copyDependency() {
     cp -r ./dist/fireplace/_internal_full/$1 ./dist/fireplace/_internal/$1
 }
 
 echo "Build and packaging for Linux"
-pip install -r requirements.txt
-pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
+./build-linux.sh --use-system-packages
 if [[ $? -eq 0 ]]; then
     rm ./dist/fireplace/_internal_full
     mv ./dist/fireplace/_internal ./dist/fireplace/_internal_full
@@ -16,11 +16,13 @@ if [[ $? -eq 0 ]]; then
     copyDependency "openCL_stress.cl"
 
     # Libs
-    copyDependency "jaraco"
+    copyDependency "setuptools"
     copyDependency "lib-dynload"
     copyDependency "numpy"
+    copyDependency "jaraco"
     copyDependency "pyopencl"
     copyDependency "pyopencl-2024.2.6.dist-info"
+    copyDependency "libscipy_openblas64_-ff651d7f.so"
     copyDependency "PyQt5"
 
     # Python
@@ -29,9 +31,9 @@ if [[ $? -eq 0 ]]; then
 
     cd ./dist/fireplace
     tar -czvf ../fireplace-linux.tar.gz _internal fireplace
+    cd ../..
 fi
 
-cd ../..
 echo "Build and packaging for Windows"
 wine ./build-windows.cmd
 cd ./dist/
