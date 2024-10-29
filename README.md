@@ -1,5 +1,5 @@
 ## Overview
-This program runs **Prime Generation** on the CPU and **Hashing Algorithms** on the GPU to generate as much heat as possible.
+This program runs **Prime Number Generation** on the CPU and **OpenCL Workloads** on the GPU to generate as much heat as possible.
 I made this because I was cold, but I guess you could use this for thermal testing.
 
 ## Usage
