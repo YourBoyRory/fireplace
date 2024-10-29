@@ -5,7 +5,7 @@ copyDependency() {
 
 pip install -r requirements.txt
 
-pyinstaller --name "fireplace" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
+pyinstaller --name "fireplace" --add-data "assets/icon-small.png:assets" --add-data "assets/fire.gif:assets" --add-data "openCL_stress.cl:." ./Fireplace.py
 if [[ $? -eq 0 ]]; then
     rm ./dist/fireplace/_internal_full
     mv ./dist/fireplace/_internal ./dist/fireplace/_internal_full

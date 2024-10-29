@@ -1,7 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QMovie, QIcon 
 from PyQt5.QtCore import Qt
 
 class GifWindow(QMainWindow):
@@ -11,6 +11,8 @@ class GifWindow(QMainWindow):
 
         self.label = QLabel(self)
         self.movie = QMovie(gif_path)
+        
+        self.setWindowIcon(QIcon(self.getAssetPath('icon-small.png')))
 
         if "--fullscreen" in sys.argv:
             self.setWindowState(Qt.WindowFullScreen)
@@ -29,6 +31,13 @@ class GifWindow(QMainWindow):
                 self.setWindowState(Qt.WindowNoState)
             else:
                 self.setWindowState(Qt.WindowFullScreen)
+
+    def getAssetPath(self, file):
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(__file__)
+        return os.path.join(base_path, 'assets', file)
 
 
 class GifPlayer:
