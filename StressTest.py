@@ -81,7 +81,11 @@ class GPUStressTest:
 
     def create_context_and_queue(self):
         platforms = cl.get_platforms()
-        context = cl.Context([platforms[1].get_devices()[0]])
+        for platform in platforms:
+            if platform.get_devices() != []:
+                device = platform.get_devices()[0]
+                break
+        context = cl.Context([device])
         queue = cl.CommandQueue(context)
         return context, queue
 
