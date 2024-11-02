@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [[ "$1" != "--use-system-packages" ]]; then
-    python -m venv ./venv
-    source ./venv/bin/activate
-    pip install -r requirements.txt
+    python -m venv ./venv-linux
+    source ./venv-linux/bin/activate
+    pip install -r requirements-linux.txt
 else
     echo "Using system packages"
 fi
