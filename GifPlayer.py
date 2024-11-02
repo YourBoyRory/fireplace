@@ -126,5 +126,3 @@ class GifPlayer:
         ui = GifWindow(gif_path)
         ui.show()
         app.exec_()
-
-GifPlayer("./assets/fire.gif")
