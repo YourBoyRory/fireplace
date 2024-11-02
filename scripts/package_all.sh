@@ -6,8 +6,8 @@ copyDependency() {
 }
 
 echo "Build and packaging for Linux"
-./scripts/build-linux.sh #--use-system-packages
-false
+./scripts/build-linux.sh --use-system-packages
+#false
 if [[ $? -eq 0 ]]; then
     cd ./dist/fireplace
     rm ./_internal_full
@@ -20,6 +20,7 @@ if [[ $? -eq 0 ]]; then
 
     # Libs
     copyDependency "setuptools"
+    copyDependency "psutil"
     copyDependency "lib-dynload"
     copyDependency "numpy"
     copyDependency "jaraco"
