@@ -231,11 +231,15 @@ class DummyHarwareLib:
 
 class HardwareLib:
     def __init__(self):
-        if platform.system() == 'Linux':
-            self.lib = LinuxHardwareLib()
-        elif platform.system() == 'Windows':
-            self.lib = WindowsHardwareLib()
-        else:
+        try:
+            if platform.system() == 'Linux':
+                self.lib = LinuxHardwareLib()
+            elif platform.system() == 'Windows':
+                self.lib = WindowsHardwareLib()
+            else:
+                self.lib = DummyHarwareLib()
+        except:
+            print(f"Hardware Error: {platform.system()} driver failed to Initialize")
             self.lib = DummyHarwareLib()
             
         self.gpuModel = self.lib.gpuModel

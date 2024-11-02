@@ -6,7 +6,8 @@ copyDependency() {
 }
 
 echo "Build and packaging for Linux"
-sudo ./scripts/build-linux.sh --use-system-packages
+./scripts/build-linux.sh #--use-system-packages
+false
 if [[ $? -eq 0 ]]; then
     cd ./dist/fireplace
     rm ./_internal_full
@@ -30,10 +31,11 @@ if [[ $? -eq 0 ]]; then
     # Python
     copyDependency "base_library.zip"
     copyDependency "libpython3.12.so.1.0"
-
-    tar -czvf ../fireplace-linux.tar.gz _internal fireplace
     cd ../../
 fi
+cd ./dist/fireplace
+tar -czvf ../fireplace-linux.tar.gz _internal fireplace
+cd ../../
 
 echo "Build and packaging for Windows"
 wine ./scripts/build-windows.cmd
