@@ -21,7 +21,7 @@ if __name__ == "__main__":
         gpuStresser.startLoad()
         GifPlayer(getAssetPath('fire.gif'))
     except Exception as e:
-        print(f"\nAh shit, here we go again... {e}")
+        print(f"\nAh shit, here we go again...\n    Exception: {e}")
     finally:
         print("Goodbye...")
         cpuStresser.stopLoad()
