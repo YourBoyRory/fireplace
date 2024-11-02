@@ -59,7 +59,7 @@ class GifWindow(QMainWindow):
         self.movie.start()
         
         self.tempLabel = QLabel('\n', self.gif)
-        self.tempLabel.setStyleSheet("color: gray;")
+        self.tempLabel.setStyleSheet("color: gray; font-size: 14px;")
         self.tempLabel.setMinimumSize(800, 0)
         self.tempLabel.move(10, 10)
         

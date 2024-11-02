@@ -185,6 +185,7 @@ class WindowsHardwareLib:
 
     def get_cpu_temp(self):
         temp = None
+        self.c.Hardware[0].Update()
         for a in range(0, len(self.c.Hardware[0].Sensors)):
             #print(self.c.Hardware[0].Sensors[a].Identifier)
             if "/temperature" in str(self.c.Hardware[0].Sensors[a].Identifier):
@@ -192,6 +193,7 @@ class WindowsHardwareLib:
         return temp
         
     def get_gpu_temp(self):
+        self.c.Hardware[1].Update()
         for a in range(0, len(self.c.Hardware[1].Sensors)):
             #print(self.c.Hardware[1].Sensors[a].Identifier)
             if "/temperature" in str(self.c.Hardware[1].Sensors[a].Identifier):
@@ -200,6 +202,7 @@ class WindowsHardwareLib:
 
     def get_cpu_usage(self):
         load = None
+        self.c.Hardware[0].Update()
         for a in range(0, len(self.c.Hardware[0].Sensors)):
             #print(self.c.Hardware[0].Sensors[a].Identifier)
             if "/load" in str(self.c.Hardware[0].Sensors[a].Identifier):
@@ -207,6 +210,7 @@ class WindowsHardwareLib:
         return load
         
     def get_gpu_usage(self):
+        self.c.Hardware[1].Update()
         for a in range(0, len(self.c.Hardware[1].Sensors)):
             #print(self.c.Hardware[1].Sensors[a].Identifier)
             if "/load" in str(self.c.Hardware[1].Sensors[a].Identifier):
