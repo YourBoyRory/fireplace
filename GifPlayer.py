@@ -1,29 +1,22 @@
 import sys
 import os
-import random
-import platform
+from HardwareLib import HardwareLib
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt5.QtGui import QMovie, QIcon
 from PyQt5.QtCore import Qt, QTimer
 import threading
 import time
 
-class LinuxTempProber:
+class TempProber:
     
     def __init__(self, interval):
-        
-        from HardwareLib import LinuxHardwareLib
-        
         self.status = 0
-        
         self.cpuTemp = None
         self.cpuUse = None
         self.gpuTemp = None
         self.gpuUse = None
-        
         self.interval = interval
-        
-        self.probe = LinuxHardwareLib()
+        self.probe = HardwareLib()
         self.running = True
         self.probeThread = threading.Thread(target=self.probeTemperatures)
         self.probeThread.daemon = True  # Exit when main program exits
@@ -45,17 +38,6 @@ class LinuxTempProber:
     def stop(self):
         self.running = False
         self.probeThread.join()
-        
-class DummyTempProber:
-    def __init__(self):
-        self.status = -1
-        self.cpuTemp = None
-        self.cpuUse = None
-        self.gpuTemp = None
-        self.gpuUse = None
-        
-    def stop(self):
-        pass
 
 class GifWindow(QMainWindow):
     def __init__(self, gif_path):
@@ -63,12 +45,7 @@ class GifWindow(QMainWindow):
 
         self.gif = QLabel(self)
         self.movie = QMovie(gif_path)
-        if platform.system() == 'Linux':
-            self.prober = LinuxTempProber(1000)
-        elif platform.system() == 'Windows':
-            self.prober = DummyTempProber()
-        else:
-            self.prober = DummyTempProber()
+        self.prober = TempProber(1000)
         
         self.setWindowIcon(QIcon(self.getAssetPath('icon-small.png')))
 
@@ -98,7 +75,7 @@ class GifWindow(QMainWindow):
         elif self.prober.status == 0: 
             pass
         else:
-            print("Window Warning: Platform Not supported")
+            print("Window Warning: Temperature reading on this platform not supported")
             self.tempLabel.setText(' ')
             self.prober.stop()
             self.probeTempTimer.stop()
@@ -127,3 +104,6 @@ class GifPlayer:
         ui = GifWindow(gif_path)
         ui.show()
         app.exec_()
+
+if __name__ == "__main__":
+    GifPlayer('./assets/fire.gif')

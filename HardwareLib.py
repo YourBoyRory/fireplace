@@ -4,8 +4,9 @@ class LinuxHardwareLib:
 
     def __init__(self):
         
-        import psutil
         import subprocess
+        import psutil
+        self.driver = "Linux"
         
         if self.__get_nvidia_gpu_temp():
             self.gpuModel = "Nvidia"
@@ -26,18 +27,20 @@ class LinuxHardwareLib:
                 self.cpuModel = "AMD"
             except:
                 self.cpuModel = None
-        print(f"Hardware Info: Platform established as Linux running on {self.cpuModel} CPU with {self.gpuModel} GPU")
-
+        print(f"Hardware Info: Platform established as {self.driver} running on {self.cpuModel} CPU with {self.gpuModel} GPU")
+        
     def __get_nvidia_gpu_temp(self):
+        import subprocess
         try:
             result = subprocess.run(['/usr/bin/nvidia-smi', '--query-gpu=temperature.gpu', '--format=csv,noheader,nounits'],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             temp = result.stdout.decode('utf-8').strip()
             return int(temp)
         except:
-            return None
+           return None
 
     def __get_nvidia_gpu_usage(self):
+        import subprocess
         try:
             result = subprocess.run(['/usr/bin/nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
@@ -47,6 +50,7 @@ class LinuxHardwareLib:
             return None
 
     def __get_amd_gpu_temp(self):
+        import subprocess
         try:
             result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showtemp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -61,6 +65,7 @@ class LinuxHardwareLib:
             return None
             
     def __get_amd_gpu_usage(self):
+        import subprocess
         try:
             result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showusage'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -75,6 +80,7 @@ class LinuxHardwareLib:
             return None
 
     def __get_intel_gpu_temp(self):
+        import subprocess
         try:
             result = subprocess.run(['intel_gpu_top', '-l', '1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -88,6 +94,7 @@ class LinuxHardwareLib:
             return None
 
     def __get_intel_gpu_usage(self):
+        import subprocess
         try:
             result = subprocess.run(['intel_gpu_top', '-b', '-l', '1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -123,12 +130,14 @@ class LinuxHardwareLib:
                 return None
 
     def get_cpu_usage(self):
+        import psutil
         try:
             return int(psutil.cpu_percent(interval=1))
         except:
             return None
 
     def get_cpu_temp(self):
+        import psutil
         try:
             temperatures = psutil.sensors_temperatures()
             if self.cpuModel == "Intel":
@@ -141,23 +150,82 @@ class LinuxHardwareLib:
 
 class WindowsHardwareLib:
     def __init__(self):
-        pass
+        self.c = None
+        self.initialize()
+        if "Intel" in self.c.Hardware[0].get_Name():
+            self.cpuModel = "Intel"
+        elif "AMD" in self.c.Hardware[0].get_Name():
+            self.cpuModel = "AMD"
+        else:
+            print("Hardware Warning: Unhandled CPU", self.c.Hardware[1].get_Name())
+            self.cpuModel = None
+        
+        if "NVIDIA" in self.c.Hardware[1].get_Name():
+            self.gpuModel = "Nvidia"
+        elif "AMD" in self.c.Hardware[1].get_Name():
+            self.gpuModel = "AMD"
+        elif "Intel" in self.c.Hardware[1].get_Name():
+            self.gpuModel = "Intel"
+        else:
+            print("Hardware Warning: Unhandled GPU", self.c.Hardware[1].get_Name())
+            self.gpuModel = None
+            
+        self.driver = "Windows"
+        
+        print(f"Hardware Info: Platform established as {self.driver} running on {self.cpuModel} CPU with {self.gpuModel} GPU")
+
+    def initialize(self):
+        import clr  # Importing inside a method
+        clr.AddReference(r'lib/OpenHardwareMonitorLib')
+        from OpenHardwareMonitor import Hardware
+        self.c = Hardware.Computer()
+        self.c.Open()
+        self.c.CPUEnabled = True
+        self.c.GPUEnabled = True
+
+    def get_cpu_temp(self):
+        temp = None
+        for a in range(0, len(self.c.Hardware[0].Sensors)):
+            #print(self.c.Hardware[0].Sensors[a].Identifier)
+            if "/temperature" in str(self.c.Hardware[0].Sensors[a].Identifier):
+                temp = int(self.c.Hardware[0].Sensors[a].get_Value())
+        return temp
+        
+    def get_gpu_temp(self):
+        for a in range(0, len(self.c.Hardware[1].Sensors)):
+            #print(self.c.Hardware[1].Sensors[a].Identifier)
+            if "/temperature" in str(self.c.Hardware[1].Sensors[a].Identifier):
+                return int(self.c.Hardware[1].Sensors[a].get_Value())
+        return None
+
+    def get_cpu_usage(self):
+        load = None
+        for a in range(0, len(self.c.Hardware[0].Sensors)):
+            #print(self.c.Hardware[0].Sensors[a].Identifier)
+            if "/load" in str(self.c.Hardware[0].Sensors[a].Identifier):
+                load = int(self.c.Hardware[0].Sensors[a].get_Value())
+        return load
+        
+    def get_gpu_usage(self):
+        for a in range(0, len(self.c.Hardware[1].Sensors)):
+            #print(self.c.Hardware[1].Sensors[a].Identifier)
+            if "/load" in str(self.c.Hardware[1].Sensors[a].Identifier):
+                return int(self.c.Hardware[1].Sensors[a].get_Value())
+        return None
+    
     
 class DummyHarwareLib:
     def __init__(self):
         self.gpuModel = None
         self.cpuModel = None
-        print(f"Hardware Warning: Platform established as Dummy running on {self.cpuModel} CPU with {self.gpuModel} GPU")
-    
+        self.driver = "Dummy"
+        print(f"Hardware Warning: {self.driver} driver")
     def get_gpu_temp(self):
         return None
-
     def get_gpu_usage(self):
         return None
-
     def get_cpu_usage(self):
         return None
-
     def get_cpu_temp(self):
         return None
 
@@ -168,7 +236,7 @@ class HardwareLib:
         elif platform.system() == 'Windows':
             self.lib = WindowsHardwareLib()
         else:
-            self.lib = DummyTempProber()
+            self.lib = DummyHarwareLib()
             
         self.gpuModel = self.lib.gpuModel
         self.cpuModel = self.lib.cpuModel
@@ -188,7 +256,7 @@ class HardwareLib:
 
 if __name__ == "__main__":
     probe = HardwareLib()
-    print(probe.get_cpu_temp())
-    print(probe.get_cpu_usage())
-    print(probe.get_gpu_temp())
-    print(probe.get_gpu_usage())
+    print("CPU TEMP:", f'{probe.get_cpu_temp()}c')
+    print("CPU USAGE:", f'{probe.get_cpu_usage()}%')
+    print("GPU TEMP:", f'{probe.get_gpu_temp()}c')
+    print("GPU USAGE:", f'{probe.get_gpu_usage()}%')
