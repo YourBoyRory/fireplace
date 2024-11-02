@@ -1,15 +1,17 @@
-import psutil
-import subprocess
 import platform
 
 class LinuxHardwareLib:
 
     def __init__(self):
-        if self.get_nvidia_gpu_temp():
+        
+        import psutil
+        import subprocess
+        
+        if self.__get_nvidia_gpu_temp():
             self.gpuModel = "Nvidia"
-        elif self.get_amd_gpu_temp():
+        elif self.__get_amd_gpu_temp():
             self.gpuModel = "AMD"
-        elif self.get_intel_gpu_temp():
+        elif self.__get_intel_gpu_temp():
             self.gpuModel = "Intel"
         else:
             self.gpuModel = None
@@ -26,7 +28,7 @@ class LinuxHardwareLib:
                 self.cpuModel = None
         print(f"Hardware Info: Platform established as Linux running on {self.cpuModel} CPU with {self.gpuModel} GPU")
 
-    def get_nvidia_gpu_temp(self):
+    def __get_nvidia_gpu_temp(self):
         try:
             result = subprocess.run(['/usr/bin/nvidia-smi', '--query-gpu=temperature.gpu', '--format=csv,noheader,nounits'],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
@@ -35,7 +37,7 @@ class LinuxHardwareLib:
         except:
             return None
 
-    def get_nvidia_gpu_usage(self):
+    def __get_nvidia_gpu_usage(self):
         try:
             result = subprocess.run(['/usr/bin/nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
@@ -44,14 +46,7 @@ class LinuxHardwareLib:
         except:
             return None
 
-    def get_amd_gpu_temp(self):
-        try:
-            temperatures = psutil.sensors_temperatures()
-            return int(temperatures['amdgpu'][0][1])
-        except:
-            return get_amd_gpu_temp_backup()
-
-    def get_amd_gpu_temp_backup(self):
+    def __get_amd_gpu_temp(self):
         try:
             result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showtemp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -65,7 +60,7 @@ class LinuxHardwareLib:
         except:
             return None
             
-    def get_amd_gpu_usage(self):
+    def __get_amd_gpu_usage(self):
         try:
             result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showusage'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -79,7 +74,7 @@ class LinuxHardwareLib:
         except:
             return None
 
-    def get_intel_gpu_temp(self):
+    def __get_intel_gpu_temp(self):
         try:
             result = subprocess.run(['intel_gpu_top', '-l', '1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -92,7 +87,7 @@ class LinuxHardwareLib:
         except:
             return None
 
-    def get_intel_gpu_usage(self):
+    def __get_intel_gpu_usage(self):
         try:
             result = subprocess.run(['intel_gpu_top', '-b', '-l', '1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             output = result.stdout.decode('utf-8')
@@ -108,22 +103,22 @@ class LinuxHardwareLib:
     def get_gpu_temp(self):
         match self.gpuModel:
             case "Nvidia":
-                return self.get_nvidia_gpu_temp()
+                return self.__get_nvidia_gpu_temp()
             case "AMD":
-                return self.get_amd_gpu_temp()
+                return self.__get_amd_gpu_temp()
             case "Intel":
-                return self.get_intel_gpu_temp()
+                return self.__get_intel_gpu_temp()
             case _:
                 return None
 
     def get_gpu_usage(self):
         match self.gpuModel:
             case "Nvidia":
-                return self.get_nvidia_gpu_usage()
+                return self.__get_nvidia_gpu_usage()
             case "AMD":
-                return self.get_amd_gpu_usage()
+                return self.__get_amd_gpu_usage()
             case "Intel":
-                return self.get_intel_gpu_usage()
+                return self.__get_intel_gpu_usage()
             case _:
                 return None
 
@@ -143,3 +138,57 @@ class LinuxHardwareLib:
             return int(temp)
         except:
             return None
+
+class WindowsHardwareLib:
+    def __init__(self):
+        pass
+    
+class DummyHarwareLib:
+    def __init__(self):
+        self.gpuModel = None
+        self.cpuModel = None
+        print(f"Hardware Warning: Platform established as Dummy running on {self.cpuModel} CPU with {self.gpuModel} GPU")
+    
+    def get_gpu_temp(self):
+        return None
+
+    def get_gpu_usage(self):
+        return None
+
+    def get_cpu_usage(self):
+        return None
+
+    def get_cpu_temp(self):
+        return None
+
+class HardwareLib:
+    def __init__(self):
+        if platform.system() == 'Linux':
+            self.lib = LinuxHardwareLib()
+        elif platform.system() == 'Windows':
+            self.lib = WindowsHardwareLib()
+        else:
+            self.lib = DummyTempProber()
+            
+        self.gpuModel = self.lib.gpuModel
+        self.cpuModel = self.lib.cpuModel
+        
+    def get_gpu_temp(self):
+        return self.lib.get_gpu_temp()
+
+    def get_gpu_usage(self):
+        return self.lib.get_gpu_usage()
+
+    def get_cpu_usage(self):
+        return self.lib.get_cpu_usage()
+
+    def get_cpu_temp(self):
+        return self.lib.get_cpu_temp()
+
+
+if __name__ == "__main__":
+    probe = HardwareLib()
+    print(probe.get_cpu_temp())
+    print(probe.get_cpu_usage())
+    print(probe.get_gpu_temp())
+    print(probe.get_gpu_usage())
