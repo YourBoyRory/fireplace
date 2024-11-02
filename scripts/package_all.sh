@@ -6,7 +6,7 @@ copyDependency() {
 }
 
 echo "Build and packaging for Linux"
-./scripts/build-linux.sh --use-system-packages
+sudo ./scripts/build-linux.sh --use-system-packages
 if [[ $? -eq 0 ]]; then
     cd ./dist/fireplace
     rm ./_internal_full

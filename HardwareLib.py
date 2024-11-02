@@ -1,9 +1,8 @@
 import psutil
 import subprocess
-import json
 import platform
 
-class HardwareLib:
+class LinuxHardwareLib:
 
     def __init__(self):
         if self.get_nvidia_gpu_temp():

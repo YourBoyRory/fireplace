@@ -5,12 +5,14 @@ import platform
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 from PyQt5.QtGui import QMovie, QIcon
 from PyQt5.QtCore import Qt, QTimer
-from HardwareLib import HardwareLib
 import threading
 import time
 
 class LinuxTempProber:
+    
     def __init__(self, interval):
+        
+        from HardwareLib import LinuxHardwareLib
         
         self.status = 0
         
@@ -21,7 +23,7 @@ class LinuxTempProber:
         
         self.interval = interval
         
-        self.probe = HardwareLib()
+        self.probe = LinuxHardwareLib()
         self.running = True
         self.probeThread = threading.Thread(target=self.probeTemperatures)
         self.probeThread.daemon = True  # Exit when main program exits

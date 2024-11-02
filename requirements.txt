@@ -2,3 +2,4 @@ numpy
 pyinstaller
 pyopencl
 PyQt5
+psutil
