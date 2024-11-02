@@ -23,6 +23,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\nAh shit, here we go again...\n    Exception: {e}")
     finally:
-        print("Goodbye...")
+        print("Info: Starting Shutdown, Goodbye...")
         cpuStresser.stopLoad()
         gpuStresser.stopLoad()

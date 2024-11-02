@@ -25,7 +25,7 @@ class HardwareLib:
                 self.cpuModel = "AMD"
             except:
                 self.cpuModel = None
-        print(f"Platform established as {self.cpuModel} CPU with {self.gpuModel} GPU")
+        print(f"Hardware Info: Platform established as Linux running on {self.cpuModel} CPU with {self.gpuModel} GPU")
 
     def get_nvidia_gpu_temp(self):
         try:
@@ -33,6 +33,15 @@ class HardwareLib:
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
             temp = result.stdout.decode('utf-8').strip()
             return int(temp)
+        except:
+            return None
+
+    def get_nvidia_gpu_usage(self):
+        try:
+            result = subprocess.run(['/usr/bin/nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            usage = result.stdout.decode('utf-8').strip()
+            return int(usage)
         except:
             return None
 
@@ -56,6 +65,20 @@ class HardwareLib:
                     return temp
         except:
             return None
+            
+    def get_amd_gpu_usage(self):
+        try:
+            result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showusage'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            output = result.stdout.decode('utf-8')
+            # Parse the output to find the usage
+            for line in output.splitlines():
+                if "GPU Util" in line:
+                    # Example output line: "GPU Util: 50 %"
+                    usage = int(line.split(":")[1].strip().split(" ")[0])
+                    print(f"Using AMD backup method")
+                    return usage
+        except:
+            return None
 
     def get_intel_gpu_temp(self):
         try:
@@ -70,6 +93,19 @@ class HardwareLib:
         except:
             return None
 
+    def get_intel_gpu_usage(self):
+        try:
+            result = subprocess.run(['intel_gpu_top', '-b', '-l', '1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            output = result.stdout.decode('utf-8')
+            # Parse the output for utilization
+            for line in output.splitlines():
+                if "Usage" in line:
+                    # Example: Usage: 45%
+                    usage = int(line.split(":")[1].strip().replace('%', '').strip())
+                    return usage
+        except:
+            return None
+
     def get_gpu_temp(self):
         match self.gpuModel:
             case "Nvidia":
@@ -78,6 +114,17 @@ class HardwareLib:
                 return self.get_amd_gpu_temp()
             case "Intel":
                 return self.get_intel_gpu_temp()
+            case _:
+                return None
+
+    def get_gpu_usage(self):
+        match self.gpuModel:
+            case "Nvidia":
+                return self.get_nvidia_gpu_usage()
+            case "AMD":
+                return self.get_amd_gpu_usage()
+            case "Intel":
+                return self.get_intel_gpu_usage()
             case _:
                 return None
 
