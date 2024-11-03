@@ -2,7 +2,7 @@ import sys
 import os
 from HardwareLib import HardwareLib
 from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
-from PyQt5.QtGui import QMovie, QIcon
+from PyQt5.QtGui import QMovie, QIcon, QFontDatabase, QFont
 from PyQt5.QtCore import Qt, QTimer
 import threading
 import time
@@ -48,6 +48,10 @@ class GifWindow(QMainWindow):
         self.prober = TempProber(1000)
         
         self.setWindowIcon(QIcon(self.getAssetPath('icon-small.png')))
+        font_id = QFontDatabase.addApplicationFont(self.getAssetPath('font.ttf'))
+        if font_id != -1:
+            # Get the family name of the loaded font
+            self.monoFont = QFontDatabase.applicationFontFamilies(font_id)[0]
 
         if "--fullscreen" in sys.argv:
             self.setWindowState(Qt.WindowFullScreen)
@@ -59,19 +63,41 @@ class GifWindow(QMainWindow):
         self.movie.start()
         
         self.tempLabel = QLabel('\n', self.gif)
-        self.tempLabel.setStyleSheet("color: gray; font-size: 14px;")
-        self.tempLabel.setMinimumSize(800, 0)
-        self.tempLabel.move(10, 10)
+        self.tempLabel.setStyleSheet("color: gray;")
+        self.resizeEvent = self.onResize
         
         self.probeTempTimer = QTimer(self)
         self.probeTempTimer.timeout.connect(self.readTemperatures)
         self.probeTempTimer.start(1500)
 
+    def onResize(self, event):
+        self.setLableSize()
+        super().resizeEvent(event)
+        
+    def setLableSize(self):
+        #Text
+        fs = int(24 * ((self.size().width()+self.size().height())/2666))
+        self.tempLabel.setFont(QFont(self.monoFont, fs)) 
+        
+        #Size
+        self.tempLabel.adjustSize()
+        x = int((self.size().width()-self.tempLabel.width())/2)
+        y = int(self.size().height()-self.tempLabel.height()) - 10
+        self.tempLabel.move(x, y)
+        self.tempLabel.adjustSize()
+        
     def readTemperatures(self):
         if self.prober.status == 1:
-            info = f'CPU: {self.prober.cpuTemp}c {self.prober.cpuUse}%\nGPU: {self.prober.gpuTemp}c {self.prober.gpuUse}%'
-            #print(f"Window Info:\n   {info}")
+            cpuLable = "CPU"
+            gpuLable = "GPU"
+            cpuTemp = f"{self.prober.cpuTemp}c"
+            cpuUse = f"{self.prober.cpuUse}%"
+            gpuTemp = f"{self.prober.gpuTemp}c"
+            gpuUse = f"{self.prober.gpuUse}%"
+            info = f'{cpuLable:>9} ║ {gpuLable} \n{cpuTemp:>4} {cpuUse:>4} ║ {gpuUse:<4} {gpuTemp:<4}'
+            #print(f"Window Info:   {info}")
             self.tempLabel.setText(info)
+            self.setLableSize()
         elif self.prober.status == 0: 
             pass
         else:
