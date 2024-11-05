@@ -81,15 +81,46 @@ class GPUStressTest:
         return program
 
     def create_context_and_queue(self):
-        platforms = cl.get_platforms()
-        for platform in platforms:
-            if platform.get_devices() != []:
-                device = platform.get_devices()[0]
-                break
-        print(f"GPU Info: Dispatching GPU Worker on {device}")
+        device = self.getWorker()
         context = cl.Context([device])
         queue = cl.CommandQueue(context)
         return context, queue
+
+    def getWorker(self):
+        platforms = cl.get_platforms()
+        nvidia_device = None
+        amd_device = None
+        intel_device = None
+        device = None
+        # Find first NVIDIA GPU
+        for platform in platforms:
+            if platform.get_devices() != []:
+                if "NVIDIA" in platform.get_devices()[0].name and nvidia_device == None:
+                    print("GPU Info: Found NVIDIA device", platform.get_devices()[0].name)
+                    nvidia_device = platform.get_devices()[0]
+                    break
+                elif "AMD" in platform.get_devices()[0].name and amd_device == None:
+                    print("GPU Info: Found AMD device", platform.get_devices()[0].name)
+                    amd_device = platform.get_devices()[0]
+                elif "Intel" in platform.get_devices()[0].name and intel_device == None:
+                    print("GPU Info: Found Intel device", platform.get_devices()[0].name)
+                    intel_device = platform.get_devices()[0]
+                elif device == None:
+                    print("GPU Info: Found fallback device", platform.get_devices()[0].name)
+                    device = platform.get_devices()[0]
+        if nvidia_device != None:
+            print("GPU Info: Using Nvidia device")
+            device = nvidia_device
+        elif amd_device != None:
+            print("GPU Info: Using AMD device")
+            device = amd_device
+        elif intel_device != None:
+            print("GPU Info: Using Intel device")
+            device = intel_device
+        else:
+            print("Using fallback device")
+        print(f"GPU Info: Dispatching GPU Worker on {device}")
+        return device
 
     def startLoad(self):
         multiprocessing.freeze_support()
@@ -103,3 +134,19 @@ class GPUStressTest:
             self.worker.join()
             self.worker = None
         print("GPU Info: Stopped GPU Worker")
+
+if __name__ == "__main__":
+
+    gpuStresser = GPUStressTest()
+    cpuStresser = CPUStressTest()
+
+    try:
+        cpuStresser.startLoad()
+        gpuStresser.startLoad()
+        input("")
+    except Exception as e:
+        print(f"\nAh shit, here we go again...\n    Exception: {e}")
+    finally:
+        print("Info: Starting Shutdown, Goodbye...")
+        cpuStresser.stopLoad()
+        gpuStresser.stopLoad()
