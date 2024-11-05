@@ -8,7 +8,7 @@ import threading
 import time
 
 class TempProber:
-    
+
     def __init__(self, interval):
         self.status = 0
         self.cpuTemp = None
@@ -46,7 +46,7 @@ class GifWindow(QMainWindow):
         self.gif = QLabel(self)
         self.movie = QMovie(gif_path)
         self.prober = TempProber(1000)
-        
+
         self.setWindowIcon(QIcon(self.getAssetPath('icon-small.png')))
         font_id = QFontDatabase.addApplicationFont(self.getAssetPath('font.ttf'))
         if font_id != -1:
@@ -61,11 +61,11 @@ class GifWindow(QMainWindow):
         self.gif.setMinimumSize(800, 600)
         self.gif.setScaledContents(True)
         self.movie.start()
-        
+
         self.tempLabel = QLabel('\n', self.gif)
         self.tempLabel.setStyleSheet("color: gray;")
         self.resizeEvent = self.onResize
-        
+
         self.probeTempTimer = QTimer(self)
         self.probeTempTimer.timeout.connect(self.readTemperatures)
         self.probeTempTimer.start(1500)
@@ -73,19 +73,19 @@ class GifWindow(QMainWindow):
     def onResize(self, event):
         self.setLableSize()
         super().resizeEvent(event)
-        
+
     def setLableSize(self):
         #Text
         fs = int(24 * ((self.size().width()+self.size().height())/2666))
-        self.tempLabel.setFont(QFont(self.monoFont, fs)) 
-        
+        self.tempLabel.setFont(QFont(self.monoFont, fs))
+
         #Size
         self.tempLabel.adjustSize()
         x = int((self.size().width()-self.tempLabel.width())/2)
         y = int(self.size().height()-self.tempLabel.height()) - 10
         self.tempLabel.move(x, y)
         self.tempLabel.adjustSize()
-        
+
     def readTemperatures(self):
         if self.prober.status == 1:
             cpuLable = "CPU"
@@ -98,7 +98,7 @@ class GifWindow(QMainWindow):
             #print(f"Window Info:   {info}")
             self.tempLabel.setText(info)
             self.setLableSize()
-        elif self.prober.status == 0: 
+        elif self.prober.status == 0:
             pass
         else:
             print("Window Warning: Temperature reading on this platform not supported")

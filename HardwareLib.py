@@ -3,11 +3,12 @@ import platform
 class LinuxHardwareLib:
 
     def __init__(self):
-        
+
         import subprocess
         import psutil
+
         self.driver = "Linux"
-        
+
         if self.__get_nvidia_gpu_temp():
             self.gpuModel = "Nvidia"
         elif self.__get_amd_gpu_temp():
@@ -28,7 +29,7 @@ class LinuxHardwareLib:
             except:
                 self.cpuModel = None
         print(f"Hardware Info: Platform established as {self.driver} running on {self.cpuModel} CPU with {self.gpuModel} GPU")
-        
+
     def __get_nvidia_gpu_temp(self):
         import subprocess
         try:
@@ -51,31 +52,22 @@ class LinuxHardwareLib:
 
     def __get_amd_gpu_temp(self):
         import subprocess
+        import json
         try:
-            result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showtemp'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-            output = result.stdout.decode('utf-8')
-            # Parse the output to find the temperature
-            for line in output.splitlines():
-                if "Temperature" in line:
-                    # Example output line: "Temperature: 45 C"
-                    temp = int(line.split(":")[1].strip().split(" ")[0])
-                    print(f"Using AMD backup method")
-                    return temp
+            result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showtemp', '--json'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            output = json.loads(result.stdout.decode('utf-8').strip())
+            return int(float(output['card0']['Temperature (Sensor edge) (C)']))
         except:
             return None
-            
+
     def __get_amd_gpu_usage(self):
         import subprocess
+        import json
         try:
-            result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showusage'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-            output = result.stdout.decode('utf-8')
+            result = subprocess.run(['/opt/rocm/bin/rocm-smi', '--showuse', '--json'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+            output = json.loads(result.stdout.decode('utf-8').strip())
+            return int(output['card0']['GPU use (%)'])
             # Parse the output to find the usage
-            for line in output.splitlines():
-                if "GPU Util" in line:
-                    # Example output line: "GPU Util: 50 %"
-                    usage = int(line.split(":")[1].strip().split(" ")[0])
-                    print(f"Using AMD backup method")
-                    return usage
         except:
             return None
 
@@ -159,7 +151,7 @@ class WindowsHardwareLib:
         else:
             print("Hardware Warning: Unhandled CPU", self.c.Hardware[1].get_Name())
             self.cpuModel = None
-        
+
         if "NVIDIA" in self.c.Hardware[1].get_Name():
             self.gpuModel = "Nvidia"
         elif "AMD" in self.c.Hardware[1].get_Name():
@@ -169,9 +161,9 @@ class WindowsHardwareLib:
         else:
             print("Hardware Warning: Unhandled GPU", self.c.Hardware[1].get_Name())
             self.gpuModel = None
-            
+
         self.driver = "Windows"
-        
+
         print(f"Hardware Info: Platform established as {self.driver} running on {self.cpuModel} CPU with {self.gpuModel} GPU")
 
     def initialize(self):
@@ -191,7 +183,7 @@ class WindowsHardwareLib:
             if "/temperature" in str(self.c.Hardware[0].Sensors[a].Identifier):
                 temp = int(self.c.Hardware[0].Sensors[a].get_Value())
         return temp
-        
+
     def get_gpu_temp(self):
         self.c.Hardware[1].Update()
         for a in range(0, len(self.c.Hardware[1].Sensors)):
@@ -208,7 +200,7 @@ class WindowsHardwareLib:
             if "/load" in str(self.c.Hardware[0].Sensors[a].Identifier):
                 load = int(self.c.Hardware[0].Sensors[a].get_Value())
         return load
-        
+
     def get_gpu_usage(self):
         self.c.Hardware[1].Update()
         for a in range(0, len(self.c.Hardware[1].Sensors)):
@@ -216,8 +208,8 @@ class WindowsHardwareLib:
             if "/load" in str(self.c.Hardware[1].Sensors[a].Identifier):
                 return int(self.c.Hardware[1].Sensors[a].get_Value())
         return None
-    
-    
+
+
 class DummyHarwareLib:
     def __init__(self):
         self.gpuModel = None
@@ -245,10 +237,10 @@ class HardwareLib:
         except:
             print(f"Hardware Error: {platform.system()} driver failed to Initialize")
             self.lib = DummyHarwareLib()
-            
+
         self.gpuModel = self.lib.gpuModel
         self.cpuModel = self.lib.cpuModel
-        
+
     def get_gpu_temp(self):
         return self.lib.get_gpu_temp()
 
