@@ -6,8 +6,8 @@ copyDependency() {
 }
 
 echo "Build and packaging for Linux"
-./scripts/build-linux.sh --use-system-packages
-#false
+./scripts/build-linux.sh #--use-system-packages
+false
 if [[ $? -eq 0 ]]; then
     cd ./dist/fireplace
     rm ./_internal_full
@@ -38,14 +38,16 @@ cd ./dist/fireplace
 tar -czvf ../fireplace-linux.tar.gz _internal fireplace
 cd ../../
 
+rm -r ./dist/fireplace
+
 echo "Build and packaging for Windows"
 wine ./scripts/build-windows.cmd
 cd ./dist/
-zip  ./fireplace-windows.zip ./Fireplace.exe
+zip  ./fireplace-windows.zip ./_internal ./Fireplace.exe
 
 echo " "
 echo "Packaging Complete"
 echo " "
 cd ..
-ls -lh ./dist/fireplace-windows.zip 
+ls -lh ./dist/fireplace-windows.zip
 ls -lh ./dist/fireplace-linux.tar.gz

@@ -1,6 +1,7 @@
 import math
 import os
 import sys
+import time
 import multiprocessing
 import pyopencl as cl
 import numpy as np
@@ -101,7 +102,8 @@ class GPUStressTest:
                     break
                 elif "AMD" in platform.get_devices()[0].name and amd_device == None:
                     print("GPU Info: Found AMD device", platform.get_devices()[0].name)
-                    amd_device = platform.get_devices()[0]
+                    #amd_device = platform.get_devices()[0]
+                    # this is a patch to make it work on my amd desktop, should still works as long as intel igpu is not present too.
                 elif "Intel" in platform.get_devices()[0].name and intel_device == None:
                     print("GPU Info: Found Intel device", platform.get_devices()[0].name)
                     intel_device = platform.get_devices()[0]
